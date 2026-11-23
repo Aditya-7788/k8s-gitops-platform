@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Task Manager</title>
+    <style>
+      body { font: 16px system-ui, sans-serif; margin: 3rem auto; max-width: 42rem; padding: 0 1rem; }
+      form { display: flex; gap: .5rem; }
+      input { flex: 1; padding: .6rem; }
+      button { padding: .6rem 1rem; }
+      li { margin: .6rem 0; }
+      #status { min-height: 1.5rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Task Manager</h1>
+    <form id="task-form">
+      <label for="title">New task</label>
+      <input id="title" name="title" maxlength="200" required>
+      <button type="submit">Add</button>
+    </form>
+    <p id="status" role="status"></p>
+    <ul id="tasks"></ul>
+    <script>
+      const list = document.querySelector("#tasks");
+      const status = document.querySelector("#status");
+      async function refresh() {
+        const response = await fetch("/api/tasks");
+        if (!response.ok) throw new Error(`API returned ${response.status}`);
+        const tasks = await response.json();
+        list.replaceChildren(...tasks.map(task => {
+          const item = document.createElement("li");
+          item.textContent = `#${task.id} ${task.title}`;
+          return item;
+        }));
+      }
+      document.querySelector("#task-form").addEventListener("submit", async event => {
+        event.preventDefault();
+        status.textContent = "";
+        try {
+          const title = new FormData(event.currentTarget).get("title");
+          const response = await fetch("/api/tasks", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title })
+          });
+          if (!response.ok) throw new Error(`API returned ${response.status}`);
+          event.currentTarget.reset();
+          await refresh();
+        } catch (error) {
+          status.textContent = `Could not save task: ${error.message}`;
+        }
+      });
+      refresh().catch(error => { status.textContent = `Could not load tasks: ${error.message}`; });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+services:
+  api:
+    build:
+      context: services/api
+    image: api:v1.0.0
+    environment:
+      APP_ENV: local
+      LOG_LEVEL: info
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    stop_grace_period: 30s
+  worker:
+    build:
+      context: services/worker
+    image: worker:v1.0.0
+    environment:
+      API_URL: http://api:8000
+      WORKER_INTERVAL_SECONDS: "10"
+      LOG_LEVEL: info
+    depends_on:
+      api:
+        condition: service_healthy
+    stop_grace_period: 30s
+  frontend:
+    build:
+      context: services/frontend
+    image: frontend:v1.0.0
+    ports:
+      - "9080:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    stop_grace_period: 30s
