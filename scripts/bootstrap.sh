@@ -25,7 +25,7 @@ kubectl wait --namespace kube-system \
 
 helm repo add argo https://argoproj.github.io/argo-helm --force-update
 helm repo update argo
-helm upgrade --install argocd argo/argo-cd --version 7.7.16 \
+helm upgrade --install argocd argo/argo-cd --version 10.18.3 \
   --namespace argocd --create-namespace \
   --set server.service.type=ClusterIP \
   --wait --timeout 5m
