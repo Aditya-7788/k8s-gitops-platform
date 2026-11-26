@@ -4,7 +4,7 @@ A GitOps-driven deployment platform for a three-service demo application ("Task 
 
 > College capstone project, DevOps Institute Mumbai.
 
-**Demo video (3 min):** [Watch here](https://example.com/replace-with-demo-video)
+**Demo video :** [Watch here](https://youtu.be/P44xHYogcEM)
 
 ---
 
